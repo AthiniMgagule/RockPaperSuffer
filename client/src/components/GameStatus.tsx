@@ -38,7 +38,7 @@ export const GameStatus: React.FC = () => {
   return (
     <div className="game-status">
       <div className="status-header">
-        <h2>RPS × Ultimate Tic Tac Toe</h2>
+        <h2>Rock Paper Suffer</h2>
         <div className="player-info">
           You are playing as: <strong>{localPlayer}</strong>
         </div>

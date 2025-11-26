@@ -3,7 +3,10 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { GameService } from "./services/GameService";
+import { AuthService } from "./services/AuthService";
+import { AuthMiddleware } from "./middleware/auth.middleware";
 import { createGameRoutes } from "./routes/game.routes";
+import { createAuthRoutes } from "./routes/auth.routes";
 import { initializeSocket } from "./websocket/socket";
 import pool from "./config/database";
 
@@ -17,11 +20,14 @@ app.use(express.json());
 
 // Initialize services
 const gameService = new GameService();
+const authService = new AuthService();
+const authMiddleware = new AuthMiddleware(authService);
 
-// Initialize WebSocket
-initializeSocket(httpServer, gameService);
+// Initialize WebSocket with auth support
+initializeSocket(httpServer, gameService, authService);
 
 // Routes
+app.use("/api/auth", createAuthRoutes(authService, authMiddleware));
 app.use("/api/game", createGameRoutes(gameService));
 
 // Health check
@@ -59,6 +65,7 @@ httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📡 WebSocket ready on ws://localhost:${PORT}`);
   console.log(`💾 Database: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
+  console.log(`🔐 Auth endpoints available at /api/auth/*`);
 });
 
 export default app;

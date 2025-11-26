@@ -42,8 +42,8 @@ export class GameService {
     return game;
   }
 
-  async assignPlayerToSocket(gameId: string, socketId: string): Promise<Player> {
-    return await this.repository.assignPlayer(gameId, socketId);
+  async assignPlayerToSocket(gameId: string, socketId: string, userId?: string): Promise<Player> {
+    return await this.repository.assignPlayer(gameId, socketId, userId);
   }
 
   async getPlayerBySocket(gameId: string, socketId: string): Promise<Player | null> {
@@ -105,6 +105,4 @@ export class GameService {
   async getAllGames(): Promise<GameState[]> {
     return await this.repository.getActiveGames();
   }
-
-  
 }

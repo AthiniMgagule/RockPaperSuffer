@@ -1,11 +1,13 @@
 import { Server as SocketIOServer } from "socket.io";
 import { Server as HTTPServer } from "http";
 import { GameService } from "../services/GameService";
+import { AuthService } from "../services/AuthService";
 import { Player, RPSChoice, Position } from "../engine/types";
 
 export function initializeSocket(
   httpServer: HTTPServer,
-  gameService: GameService
+  gameService: GameService,
+  authService: AuthService
 ) {
   const io = new SocketIOServer(httpServer, {
     cors: {
@@ -17,15 +19,45 @@ export function initializeSocket(
   io.on("connection", (socket) => {
     console.log(`Client connected: ${socket.id}`);
 
-    socket.on("join:game", async (gameId: string) => {
+    // Optional: Authenticate socket connection
+    socket.on("auth:connect", async (token: string) => {
       try {
-        socket.join(gameId);
+        const payload = authService.verifyAccessToken(token);
+        (socket as any).userId = payload.userId;
+        (socket as any).username = payload.username;
+        socket.emit("auth:success", { username: payload.username });
+      } catch (error: any) {
+        socket.emit("auth:error", { message: error.message });
+      }
+    });
+
+    socket.on("join:game", async (data: { gameId: string; token?: string }) => {
+      try {
+        socket.join(data.gameId);
         
-        // Assign player to this socket
-        const assignedPlayer = await gameService.assignPlayerToSocket(gameId, socket.id);
+        // Get userId from token if provided
+        let userId: string | undefined;
+        if (data.token) {
+          try {
+            const payload = authService.verifyAccessToken(data.token);
+            userId = payload.userId;
+            (socket as any).userId = userId;
+            (socket as any).username = payload.username;
+          } catch (error) {
+            // Continue without auth if token is invalid
+            console.log('Invalid token, continuing as guest');
+          }
+        }
+        
+        // Assign player to this socket (with optional userId)
+        const assignedPlayer = await gameService.assignPlayerToSocket(
+          data.gameId, 
+          socket.id,
+          userId
+        );
         
         // Get game state
-        const gameState = await gameService.getGameState(gameId);
+        const gameState = await gameService.getGameState(data.gameId);
         
         if (gameState) {
           // Send player assignment
@@ -35,9 +67,10 @@ export function initializeSocket(
           socket.emit("game:update", gameState);
           
           // Notify room that a player joined
-          io.to(gameId).emit("player:joined", { 
+          io.to(data.gameId).emit("player:joined", { 
             player: assignedPlayer,
-            socketId: socket.id 
+            socketId: socket.id,
+            username: (socket as any).username
           });
         }
       } catch (error: any) {
