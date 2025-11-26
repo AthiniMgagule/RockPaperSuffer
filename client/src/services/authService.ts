@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { AuthResponse, LoginCredentials, SignupData, User } from '../types/auth.types';
 
-const AUTH_API_URL = 'http://localhost:3000/api/auth';
+const AUTH_API_URL = 'https://rockpapersuffer.onrender.com/api/auth';
 
 class AuthService {
   private api = axios.create({
