@@ -4,8 +4,8 @@ import { io, Socket } from "socket.io-client";
 import { GameState, RPSResult, Player } from "../types/game.types";
 import { authService } from "./authService";
 
-const API_URL = "http://localhost:3000/api/game";
-const SOCKET_URL = "http://localhost:3000";
+const API_URL = "https://rockpapersuffer.onrender.com/api/game";
+const SOCKET_URL = "https://rockpapersuffer.onrender.com";
 
 export const api = axios.create({
   baseURL: API_URL,
