@@ -7,7 +7,7 @@ export const GameBoard: React.FC = () => {
   const { gameState, makeMove, lastMove, localPlayer } = useGameStore();
 
   if (!gameState) {
-    return <div className="game-board-placeholder">No game loaded</div>;
+    return <div className="text-slate-400 text-center">No game loaded</div>;
   }
 
   const handleCellClick = (position: Position) => {
@@ -18,8 +18,8 @@ export const GameBoard: React.FC = () => {
   const canMove = gameState.movesMade[localPlayer] < gameState.rpsRound.movesAllowed[localPlayer];
 
   return (
-    <div className="game-board">
-      <div className="main-grid">
+    <div className="bg-gradient-to-br from-slate-900/90 via-slate-800/90 to-slate-900/90 rounded-2xl shadow-2xl border-2 border-slate-700 p-6 backdrop-blur-sm">
+      <div className="grid grid-cols-3 gap-4 max-w-3xl">
         {gameState.board.map((microboardCells, index) => (
           <MicroBoard
             key={index}
