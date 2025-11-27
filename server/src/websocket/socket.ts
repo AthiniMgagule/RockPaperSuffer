@@ -11,7 +11,7 @@ export function initializeSocket(
 ) {
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: "https://rockpapersuffer.netlify.app/",
+      origin: process.env.CLIENT_URL,
       methods: ["GET", "POST"],
     },
   });
