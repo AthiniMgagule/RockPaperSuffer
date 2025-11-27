@@ -11,7 +11,7 @@ export function initializeSocket(
 ) {
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://rockpapersuffer.netlify.app/",
       methods: ["GET", "POST"],
     },
   });
